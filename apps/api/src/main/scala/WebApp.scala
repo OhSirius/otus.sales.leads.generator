@@ -16,6 +16,7 @@ import zio.blocking.Blocking
 import zio.interop.catz._
 import zio.{App, ExitCode, IO, RIO, UIO, URIO, ZEnv, ZIO}
 
+//https://github.com/softwaremill/tapir/tree/master/examples/src/main/scala/sttp/tapir/examples
 object WebApp extends App {
   case class Pet(species: String, url: String)
 

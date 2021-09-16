@@ -10,6 +10,7 @@ object Deps {
     lazy val Doobie = "0.8.8"
     lazy val Tapir = "0.19.0-M8"
     lazy val TelegramBot = "0.5.1"
+    lazy val Zio = "1.0.11"
   }
 
   lazy val kindProjector =
@@ -37,6 +38,17 @@ object Deps {
     "com.softwaremill.sttp.tapir" %% "tapir-openapi-circe-yaml" % V.Tapir
   )
 
+  //bot
   lazy val bot = "org.augustjune" %% "canoe" % V.TelegramBot
+
+  //zio
+  lazy val zio: Seq[ModuleID] = Seq(
+    "dev.zio" %% "zio" % V.Zio,
+    "dev.zio" %% "zio-interop-cats" % "3.1.1.0",
+    //"dev.zio" %% "zio-logging-slf4j" % "0.5.6",
+    "dev.zio" %% "zio-test" % V.Zio, //1.0.8
+    //"dev.zio" %% "zio-test-sbt" % V.Zio,
+    "dev.zio" %% "zio-macros" % V.Zio
+  )
 
 }

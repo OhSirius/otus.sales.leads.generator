@@ -1,4 +1,4 @@
-package ru.otus.sales.leads.generator.apps.telegramBot
+package ru.otus.sales.leads.generator.apps.bot
 
 import canoe.api._
 import canoe.models.messages.{AnimationMessage, StickerMessage, TelegramMessage, TextMessage}

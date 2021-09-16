@@ -32,6 +32,7 @@ lazy val webApi = (project in file("apps/api"))
     addCompilerPlugin(kindProjector),
     scalacOptions ++= _scalacOptions,
     libraryDependencies ++= tapir,
+    libraryDependencies ++= zio,
     libraryDependencies ++= Seq(
 //      httpAkka,
 //      jsonAkka,
@@ -90,13 +91,13 @@ lazy val webApi = (project in file("apps/api"))
   .enablePlugins(AssemblyPlugin)
 
 //Настройка webApi проекта
-lazy val telegramBot = (project in file("apps/telegramBot"))
+lazy val telegramBot = (project in file("apps/bot"))
   .settings(
-    name := "otus.sales.leads.generator.app.telegramBot",
-    mainClass := Some("ru.otus.sales.leads.generator.app.telegramBot.BotApp"),
+    name := "otus.sales.leads.generator.app.bot",
+    mainClass := Some("ru.otus.sales.leads.generator.app.bot.BotApp"),
     version := _version,
     scalaVersion := _scalaVersion,
-    idePackagePrefix := _idePackagePrefix.map(_ + ".apps.telegramBot"),
+    idePackagePrefix := _idePackagePrefix.map(_ + ".apps.bot"),
     scalacOptions ++= _scalacOptions,
     libraryDependencies ++= Seq(
       //      httpAkka,
@@ -208,12 +209,12 @@ lazy val leadUiService = (project in file("services/ui/leads")).settings(
   )
 )
 
-lazy val botService = (project in file("services/cores/telegramBot")).settings(
-  name := "otus.sales.leads.generator.services.core.telegramBot",
+lazy val botService = (project in file("services/cores/bot")).settings(
+  name := "otus.sales.leads.generator.services.core.bot",
   scalaVersion := _scalaVersion,
   version := _version,
   scalacOptions ++= _scalacOptions,
-  idePackagePrefix := _idePackagePrefix.map(_ + ".services.cores.telegramBot"),
+  idePackagePrefix := _idePackagePrefix.map(_ + ".services.cores.bot"),
   libraryDependencies ++= Seq(
     logback
     //logging,
