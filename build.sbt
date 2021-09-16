@@ -1,11 +1,13 @@
 import Deps._
+import com.permutive.sbtliquibase.SbtLiquibase
 
 //Базовые настройки
 lazy val _version = "0.1"
 lazy val _scalaVersion = "2.13.6"
 lazy val _idePackagePrefix = Some("ru.otus.sales.leads.generator")
 lazy val _scalacOptions = Seq(
-  "-deprecation"
+  "-deprecation",
+  "-Ymacro-annotations"
   //"-language:postfixOps"
   //      "-target:jvm-1.8",
   //      "-encoding", "UTF-8",
@@ -27,7 +29,9 @@ lazy val webApi = (project in file("apps/api"))
     version := _version,
     scalaVersion := _scalaVersion,
     idePackagePrefix := _idePackagePrefix.map(_ + ".apps.api"),
+    addCompilerPlugin(kindProjector),
     scalacOptions ++= _scalacOptions,
+    libraryDependencies ++= tapir,
     libraryDependencies ++= Seq(
 //      httpAkka,
 //      jsonAkka,
@@ -102,6 +106,7 @@ lazy val telegramBot = (project in file("apps/telegramBot"))
       //      streamAkka,
       //      typesafe,
       //      scallop,
+      bot,
       logback
       //      logging,
       //      bounceCastle_bcprov,
@@ -219,6 +224,31 @@ lazy val botService = (project in file("services/cores/telegramBot")).settings(
     //scalaGuice
   )
 )
+
+//Данные
+lazy val data = (project in file("data/domain"))
+  .settings(
+    name := "otus.sales.leads.generator.data.domain",
+    scalaVersion := _scalaVersion,
+    version := _version,
+    scalacOptions ++= _scalacOptions,
+    idePackagePrefix := _idePackagePrefix.map(_ + ".data.domain"),
+    liquibaseUsername := "docker",
+    liquibasePassword := "docker",
+    liquibaseDriver := "org.postgresql.Driver",
+    liquibaseUrl := "jdbc:postgresql://127.0.0.1/demo?createDatabaseIfNotExist=true",
+    liquibaseChangelog := new File("src/main/resources/liquibase/main.xml"),
+    libraryDependencies ++= Seq(
+      logback
+      //logging,
+      //spray,
+      //scalaCompiler,
+      //guiceDI,
+      //guiceExDI,
+      //scalaGuice
+    )
+  )
+  .enablePlugins(SbtLiquibase)
 
 //Инфраструктура
 lazy val common = (project in file("inf/common")).settings(
