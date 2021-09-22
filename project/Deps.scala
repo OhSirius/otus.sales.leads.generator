@@ -6,9 +6,9 @@ object Deps {
   //https://github.com/OhSirius/scala-dev-mooc-2021-03/blob/master/project/Dependencies.scala
   object V {
     lazy val KindProjector = "0.13.0"
-    lazy val Logback = "1.2.5"
-    lazy val Doobie = "0.8.8"
-    lazy val Tapir = "0.19.0-M8"
+    lazy val Logback = "1.2.6"
+    lazy val Doobie = "0.13.4"
+    lazy val Tapir = "0.18.3"
     lazy val TelegramBot = "0.5.1"
     lazy val Zio = "1.0.11"
   }
@@ -32,7 +32,7 @@ object Deps {
     "com.softwaremill.sttp.tapir" %% "tapir-zio" % V.Tapir,
     "com.softwaremill.sttp.tapir" %% "tapir-zio-http4s-server" % V.Tapir,
     "com.softwaremill.sttp.tapir" %% "tapir-json-circe" % V.Tapir,
-    "com.softwaremill.sttp.tapir" %% "tapir-swagger-ui" % V.Tapir,
+    "com.softwaremill.sttp.tapir" %% "tapir-swagger-ui-http4s" % V.Tapir,
     "com.softwaremill.sttp.tapir" %% "tapir-openapi-docs" % V.Tapir,
     "com.softwaremill.sttp.tapir" %% "tapir-openapi-circe" % V.Tapir,
     "com.softwaremill.sttp.tapir" %% "tapir-openapi-circe-yaml" % V.Tapir
@@ -44,7 +44,7 @@ object Deps {
   //zio
   lazy val zio: Seq[ModuleID] = Seq(
     "dev.zio" %% "zio" % V.Zio,
-    "dev.zio" %% "zio-interop-cats" % "3.1.1.0",
+    "dev.zio" %% "zio-interop-cats" % "2.5.1.0", //"3.1.1.0",
     //"dev.zio" %% "zio-logging-slf4j" % "0.5.6",
     "dev.zio" %% "zio-test" % V.Zio, //1.0.8
     //"dev.zio" %% "zio-test-sbt" % V.Zio,

@@ -87,7 +87,7 @@ lazy val webApi = (project in file("apps/api"))
     }
     //logLevel in assembly := Level.Debug
   )
-  .dependsOn(common, userService, leadService, leadUiService, botService)
+  .dependsOn(common, userService, leadService, leadUiService, botService, entityRepository)
   .enablePlugins(AssemblyPlugin)
 
 //Настройка webApi проекта
@@ -158,22 +158,26 @@ lazy val telegramBot = (project in file("apps/bot"))
   .enablePlugins(AssemblyPlugin)
 
 //Сервисы
-lazy val userService = (project in file("services/cores/users")).settings(
-  name := "otus.sales.leads.generator.services.core.users",
-  scalaVersion := _scalaVersion,
-  version := _version,
-  scalacOptions ++= _scalacOptions,
-  idePackagePrefix := _idePackagePrefix.map(_ + ".services.cores.users"),
-  libraryDependencies ++= Seq(
-    logback
-    //logging,
-    //spray,
-    //scalaCompiler,
-    //guiceDI,
-    //guiceExDI,
-    //scalaGuice
+lazy val userService = (project in file("services/cores/users"))
+  .settings(
+    name := "otus.sales.leads.generator.services.core.users",
+    scalaVersion := _scalaVersion,
+    version := _version,
+    scalacOptions ++= _scalacOptions,
+    idePackagePrefix := _idePackagePrefix.map(_ + ".services.cores.users"),
+    libraryDependencies ++= doobie,
+    libraryDependencies ++= zio,
+    libraryDependencies ++= Seq(
+      logback
+      //logging,
+      //spray,
+      //scalaCompiler,
+      //guiceDI,
+      //guiceExDI,
+      //scalaGuice
+    )
   )
-)
+  .dependsOn(entityRepository, common, data)
 
 lazy val leadService = (project in file("services/cores/leads")).settings(
   name := "otus.sales.leads.generator.services.core.leads",
@@ -258,6 +262,25 @@ lazy val common = (project in file("inf/common")).settings(
   version := _version,
   scalacOptions ++= _scalacOptions,
   idePackagePrefix := _idePackagePrefix.map(_ + ".inf.common"),
+  libraryDependencies ++= Seq(
+    logback
+    //logging,
+    //spray,
+    //scalaCompiler,
+    //guiceDI,
+    //guiceExDI,
+    //scalaGuice
+  )
+)
+
+lazy val entityRepository = (project in file("inf/repository")).settings(
+  name := "otus.sales.leads.generator.inf.repository",
+  scalaVersion := _scalaVersion,
+  version := _version,
+  scalacOptions ++= _scalacOptions,
+  idePackagePrefix := _idePackagePrefix.map(_ + ".inf.repository"),
+  libraryDependencies ++= doobie,
+  libraryDependencies ++= zio,
   libraryDependencies ++= Seq(
     logback
     //logging,
