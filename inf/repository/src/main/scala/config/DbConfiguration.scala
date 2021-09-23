@@ -11,11 +11,4 @@ object DbConfiguration {
   type DbUser = String
   type DbPass = String
   final case class DbConfig(driver: DbDriver, url: DbUrl, user: DbUser, password: DbPass)
-
-  val live: ULayer[DbConfiguration] = ZLayer.succeed(
-    DbConfig(
-      "org.postgresql.Driver",
-      "jdbc:postgresql://127.0.0.1/otus?createDatabaseIfNotExist=true",
-      "otus",
-      "otus"))
 }

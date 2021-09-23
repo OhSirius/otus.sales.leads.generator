@@ -39,9 +39,7 @@ object UserRegService {
                 .create(User(None, info.name, info.surname, botId))
                 .transact(trans)
                 .orElseFail(~UserRegError.LostConnection)
-            //case Some(_) => ZIO.fail(~UserRegError.LostConnection)
-            case Some(ex) => UIO.succeed(println(ex)) *> ZIO.fail(~UserRegError.LostConnection)
-
+            case Some(_) => ZIO.fail(~UserRegError.LostConnection)
           },
           user => ZIO.fail(~UserRegError.AlreadyRegistered(user.name))
         )

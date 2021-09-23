@@ -39,7 +39,7 @@ object Deps {
     "org.tpolecat" %% "doobie-core" % V.Doobie,
     "org.tpolecat" %% "doobie-postgres" % V.Doobie,
     "org.tpolecat" %% "doobie-hikari" % V.Doobie,
-    "org.tpolecat" %% "doobie-quill" % V.Doobie
+    ("org.tpolecat" %% "doobie-quill" % V.Doobie).exclude("org.slf4j", "*")
   )
 
   //tapir

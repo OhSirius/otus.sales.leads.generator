@@ -6,7 +6,7 @@ import org.http4s._
 import org.http4s.server.Router
 import org.http4s.blaze.server.BlazeServerBuilder
 import org.http4s.syntax.kleisli._
-import ru.otus.sales.leads.generator.apps.api.api.UserApi
+import ru.otus.sales.leads.generator.apps.api.api.{SwaggerApi, UserApi}
 import ru.otus.sales.leads.generator.apps.api.config.{ApiConfig, Configuration}
 import ru.otus.sales.leads.generator.inf.repository.config.DbConfiguration.DbConfiguration
 import zio.console.Console
@@ -38,22 +38,12 @@ object WebApp extends App {
 
   type AppTask[A] = RIO[AppEnvironment, A]
 
-  val yaml: String = {
-    import sttp.tapir.docs.openapi.OpenAPIDocsInterpreter
-    import sttp.tapir.openapi.circe.yaml._
-    OpenAPIDocsInterpreter()
-      .toOpenAPI(new UserApi[AppEnvironment].registerEndpoint, "Пользователи", "1.0")
-      .toYaml
-  }
-
-  val swaggerRoutes: HttpRoutes[AppTask] = new SwaggerHttp4s(yaml).routes[AppTask]
-
   val appEnvironment =
     Configuration.live >+> Blocking.live >+> DbHikariTransactor.live >+> UserRegConfig.live
 
   val httApp = Router[AppTask](
     "/" -> new UserApi[AppEnvironment]().registerRoutes,
-    "/" -> swaggerRoutes
+    "/" -> SwaggerApi.routes
   ).orNotFound
 
   val program = for {
