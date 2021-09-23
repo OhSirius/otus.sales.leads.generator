@@ -33,6 +33,7 @@ lazy val webApi = (project in file("apps/api"))
     scalacOptions ++= _scalacOptions,
     libraryDependencies ++= tapir,
     libraryDependencies ++= zio,
+    libraryDependencies ++= pureconfig,
     libraryDependencies ++= Seq(
 //      httpAkka,
 //      jsonAkka,
@@ -238,13 +239,15 @@ lazy val data = (project in file("data/domain"))
     version := _version,
     scalacOptions ++= _scalacOptions,
     idePackagePrefix := _idePackagePrefix.map(_ + ".data.domain"),
-    liquibaseUsername := "docker",
-    liquibasePassword := "docker",
+    liquibaseUsername := "otus",
+    liquibasePassword := "otus",
     liquibaseDriver := "org.postgresql.Driver",
-    liquibaseUrl := "jdbc:postgresql://127.0.0.1/demo?createDatabaseIfNotExist=true",
-    liquibaseChangelog := new File("src/main/resources/liquibase/main.xml"),
+    liquibaseUrl := "jdbc:postgresql://127.0.0.1/otus?createDatabaseIfNotExist=true",
+    liquibaseChangelog := new File("data/domain/src/main/resources/liquibase/main.xml"),
     libraryDependencies ++= Seq(
-      logback
+      logback,
+      postgres,
+      liquibase
       //logging,
       //spray,
       //scalaCompiler,

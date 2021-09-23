@@ -11,13 +11,28 @@ object Deps {
     lazy val Tapir = "0.18.3"
     lazy val TelegramBot = "0.5.1"
     lazy val Zio = "1.0.11"
+    lazy val Postgres = "42.2.20"
+    lazy val Liquibase = "3.4.2"
+    lazy val Pureconfig = "0.12.3"
   }
 
+  //pure
+  lazy val pureconfig: Seq[ModuleID] = Seq(
+    "com.github.pureconfig" %% "pureconfig" % V.Pureconfig,
+    "com.github.pureconfig" %% "pureconfig-cats-effect" % V.Pureconfig)
+
+  //kind
   lazy val kindProjector =
     ("org.typelevel" %% "kind-projector" % V.KindProjector).cross(CrossVersion.full)
 
   // logging
   lazy val logback = "ch.qos.logback" % "logback-classic" % V.Logback
+
+  //liquibase
+  lazy val liquibase = "org.liquibase" % "liquibase-core" % V.Liquibase
+
+  // postgres
+  lazy val postgres = "org.postgresql" % "postgresql" % V.Postgres
 
   //doobie
   lazy val doobie: Seq[ModuleID] = Seq(

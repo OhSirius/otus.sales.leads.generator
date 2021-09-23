@@ -1,0 +1,19 @@
+version: '2.4'
+services:
+  otus-sales-leads-generator-app-api-dev:
+    container_name: otus-sales-leads-generator-app-api-dev
+    image: otus/otus-sales-leads-generator-app-api
+    build:
+      context: ../
+      dockerfile: apps/api/Dockerfile
+    environment:
+      MODE: dev
+      DB: 'otusDB'
+    volumes:
+    - otus-sales-leads-generator-app_logs:/var/logs
+    entrypoint: /bin/sh /run_jar.sh
+    tty: true
+    dns_opt:
+      - ndots:1
+volumes:
+  otus-sales-leads-generator-app_logs: {}
