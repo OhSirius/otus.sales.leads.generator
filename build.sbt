@@ -132,14 +132,18 @@ lazy val userService = (project in file("services/cores/users"))
   )
   .dependsOn(entityRepository, common, data)
 
-lazy val leadService = (project in file("services/cores/leads")).settings(
-  name := "otus.sales.leads.generator.services.core.leads",
-  scalaVersion := _scalaVersion,
-  version := _version,
-  scalacOptions ++= _scalacOptions,
-  idePackagePrefix := _idePackagePrefix.map(_ + ".services.cores.leads"),
-  libraryDependencies ++= logback
-)
+lazy val leadService = (project in file("services/cores/leads"))
+  .settings(
+    name := "otus.sales.leads.generator.services.core.leads",
+    scalaVersion := _scalaVersion,
+    version := _version,
+    scalacOptions ++= _scalacOptions,
+    idePackagePrefix := _idePackagePrefix.map(_ + ".services.cores.leads"),
+    libraryDependencies ++= doobie,
+    libraryDependencies ++= zio,
+    libraryDependencies ++= logback
+  )
+  .dependsOn(entityRepository, common, data)
 
 lazy val leadUiService = (project in file("services/ui/leads")).settings(
   name := "otus.sales.leads.generator.services.ui.leads",

@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
+
+        <changeSet id="create person table" author="Павлычев">
+          <createTable tableName="persons">
+              <column name="id" type="int" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/> 
+              </column>
+              <column name="fullName" type="varchar(256)">
+                <constraints nullable="false"/>
+              </column>
+              <column name="phone" type="varchar(128)">
+                <constraints nullable="false"/>
+              </column>
+          </createTable>
+        </changeSet>
+
+    <changeSet id="create lead table" author="Павлычев">
+        <createTable tableName="leads">
+            <column name="id" type="int" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="person" type="int">
+                <constraints nullable="false" foreignKeyName="fk_leads_person" references="persons(id)"/>
+            </column>
+            <column name="user" type="int">
+                <constraints nullable="false" foreignKeyName="fk_leads_user" references="users(id)"/>
+            </column>
+            <column name="price" type="numeric(9,2)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+</databaseChangeLog>

@@ -5,5 +5,5 @@
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
                             http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
     <include file="default/schema/1_0/users_1.0.migrations.xml" relativeToChangelogFile="true"/>
-
+    <include file="default/schema/1_0/leads_1.1.migrations.xml" relativeToChangelogFile="true"/>
 </databaseChangeLog>

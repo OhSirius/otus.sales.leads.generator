@@ -18,13 +18,14 @@ import sttp.tapir.generic.auto._
 import sttp.tapir.server.http4s.ztapir.ZHttp4sServerInterpreter
 import zio.clock.Clock
 import ru.otus.sales.leads.generator.inf.common.extensions.ListOpts
+import ru.otus.sales.leads.generator.services.cores.users.services.UserRegService
 import zio.logging.Logging
 import zio.logging._
 
 import java.util.UUID
 
 class UserApi[R <: UserRegService with DBTransactor with Logging] {
-  type UserTask[A] = RIO[R, A]
+  //type UserTask[A] = RIO[R, A]
 
   val registerEndpoint: ZEndpoint[UserReg, ::[UserRegError], Boolean] =
     endpoint
@@ -47,7 +48,7 @@ class UserApi[R <: UserRegService with DBTransactor with Logging] {
         correlationId <- UIO(Some(UUID.randomUUID()))
         _ <- log.locally(
           _.annotate(botId, reg.bot).annotate(LogAnnotation.CorrelationId, correlationId)) {
-          register(reg)
+          UserRegService.register(reg)
         }
       } yield true
     }

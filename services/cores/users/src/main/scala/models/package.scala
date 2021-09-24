@@ -7,5 +7,6 @@ package object models {
   type UserRegName = String
   type UserRegSurname = String
   type UserRegBot = Int
+  type UserLoginBot = Int
 
 }
