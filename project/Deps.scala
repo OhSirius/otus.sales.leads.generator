@@ -26,7 +26,9 @@ object Deps {
     ("org.typelevel" %% "kind-projector" % V.KindProjector).cross(CrossVersion.full)
 
   // logging
-  lazy val logback = "ch.qos.logback" % "logback-classic" % V.Logback
+  lazy val logback: Seq[ModuleID] = Seq(
+    "ch.qos.logback" % "logback-classic" % V.Logback,
+    "net.logstash.logback" % "logstash-logback-encoder" % "6.6")
 
   //liquibase
   lazy val liquibase = "org.liquibase" % "liquibase-core" % V.Liquibase
@@ -60,7 +62,8 @@ object Deps {
   lazy val zio: Seq[ModuleID] = Seq(
     "dev.zio" %% "zio" % V.Zio,
     "dev.zio" %% "zio-interop-cats" % "2.5.1.0", //"3.1.1.0",
-    //"dev.zio" %% "zio-logging-slf4j" % "0.5.6",
+    "dev.zio" %% "zio-logging-slf4j" % "0.5.12",
+    //"dev.zio" %% "zio-logging-slf4j-bridge" % "0.5.12",
     "dev.zio" %% "zio-test" % V.Zio, //1.0.8
     //"dev.zio" %% "zio-test-sbt" % V.Zio,
     "dev.zio" %% "zio-macros" % V.Zio

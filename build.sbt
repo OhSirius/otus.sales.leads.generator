@@ -34,28 +34,7 @@ lazy val webApi = (project in file("apps/api"))
     libraryDependencies ++= tapir,
     libraryDependencies ++= zio,
     libraryDependencies ++= pureconfig,
-    libraryDependencies ++= Seq(
-//      httpAkka,
-//      jsonAkka,
-//      spray,
-//      actorAkka,
-//      streamAkka,
-//      typesafe,
-//      scallop,
-      logback
-//      logging,
-//      bounceCastle_bcprov,
-//      bounceCastle_bcmail,
-//      alpakka,
-//      sql,
-//      slick,
-//      exslick,
-//      //hikari,
-//      jtds,
-//      guiceDI,
-//      guiceExDI,
-//      scalaGuice
-    ),
+    libraryDependencies ++= logback,
     //assembly / test := {},
     assemblyJarName := s"otus-sales-leads-generator-app-api.jar",
     assemblyMergeStrategy := {
@@ -100,28 +79,9 @@ lazy val telegramBot = (project in file("apps/bot"))
     scalaVersion := _scalaVersion,
     idePackagePrefix := _idePackagePrefix.map(_ + ".apps.bot"),
     scalacOptions ++= _scalacOptions,
+    libraryDependencies ++= logback,
     libraryDependencies ++= Seq(
-      //      httpAkka,
-      //      jsonAkka,
-      //      spray,
-      //      actorAkka,
-      //      streamAkka,
-      //      typesafe,
-      //      scallop,
-      bot,
-      logback
-      //      logging,
-      //      bounceCastle_bcprov,
-      //      bounceCastle_bcmail,
-      //      alpakka,
-      //      sql,
-      //      slick,
-      //      exslick,
-      //      //hikari,
-      //      jtds,
-      //      guiceDI,
-      //      guiceExDI,
-      //      scalaGuice
+      bot
     ),
     //assembly / test := {},
     assemblyJarName := s"otus-sales-leads-generator-app-telegram-bot.jar",
@@ -168,15 +128,7 @@ lazy val userService = (project in file("services/cores/users"))
     idePackagePrefix := _idePackagePrefix.map(_ + ".services.cores.users"),
     libraryDependencies ++= doobie,
     libraryDependencies ++= zio,
-    libraryDependencies ++= Seq(
-      logback
-      //logging,
-      //spray,
-      //scalaCompiler,
-      //guiceDI,
-      //guiceExDI,
-      //scalaGuice
-    )
+    libraryDependencies ++= logback
   )
   .dependsOn(entityRepository, common, data)
 
@@ -186,15 +138,7 @@ lazy val leadService = (project in file("services/cores/leads")).settings(
   version := _version,
   scalacOptions ++= _scalacOptions,
   idePackagePrefix := _idePackagePrefix.map(_ + ".services.cores.leads"),
-  libraryDependencies ++= Seq(
-    logback
-    //logging,
-    //spray,
-    //scalaCompiler,
-    //guiceDI,
-    //guiceExDI,
-    //scalaGuice
-  )
+  libraryDependencies ++= logback
 )
 
 lazy val leadUiService = (project in file("services/ui/leads")).settings(
@@ -203,15 +147,7 @@ lazy val leadUiService = (project in file("services/ui/leads")).settings(
   version := _version,
   scalacOptions ++= _scalacOptions,
   idePackagePrefix := _idePackagePrefix.map(_ + ".services.ui.leads"),
-  libraryDependencies ++= Seq(
-    logback
-    //logging,
-    //spray,
-    //scalaCompiler,
-    //guiceDI,
-    //guiceExDI,
-    //scalaGuice
-  )
+  libraryDependencies ++= logback
 )
 
 lazy val botService = (project in file("services/cores/bot")).settings(
@@ -220,15 +156,7 @@ lazy val botService = (project in file("services/cores/bot")).settings(
   version := _version,
   scalacOptions ++= _scalacOptions,
   idePackagePrefix := _idePackagePrefix.map(_ + ".services.cores.bot"),
-  libraryDependencies ++= Seq(
-    logback
-    //logging,
-    //spray,
-    //scalaCompiler,
-    //guiceDI,
-    //guiceExDI,
-    //scalaGuice
-  )
+  libraryDependencies ++= logback
 )
 
 //Данные
@@ -245,7 +173,7 @@ lazy val data = (project in file("data/domain"))
     liquibaseUrl := "jdbc:postgresql://127.0.0.1/otus?createDatabaseIfNotExist=true",
     liquibaseChangelog := new File("data/domain/src/main/resources/liquibase/main.xml"),
     libraryDependencies ++= Seq(
-      logback,
+      //logback,
       postgres,
       liquibase
       //logging,
@@ -264,16 +192,7 @@ lazy val common = (project in file("inf/common")).settings(
   scalaVersion := _scalaVersion,
   version := _version,
   scalacOptions ++= _scalacOptions,
-  idePackagePrefix := _idePackagePrefix.map(_ + ".inf.common"),
-  libraryDependencies ++= Seq(
-    logback
-    //logging,
-    //spray,
-    //scalaCompiler,
-    //guiceDI,
-    //guiceExDI,
-    //scalaGuice
-  )
+  idePackagePrefix := _idePackagePrefix.map(_ + ".inf.common")
 )
 
 lazy val entityRepository = (project in file("inf/repository")).settings(
@@ -283,14 +202,5 @@ lazy val entityRepository = (project in file("inf/repository")).settings(
   scalacOptions ++= _scalacOptions,
   idePackagePrefix := _idePackagePrefix.map(_ + ".inf.repository"),
   libraryDependencies ++= doobie,
-  libraryDependencies ++= zio,
-  libraryDependencies ++= Seq(
-    logback
-    //logging,
-    //spray,
-    //scalaCompiler,
-    //guiceDI,
-    //guiceExDI,
-    //scalaGuice
-  )
+  libraryDependencies ++= zio
 )

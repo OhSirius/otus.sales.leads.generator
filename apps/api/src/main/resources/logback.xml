@@ -2,12 +2,17 @@
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
             <pattern>
-                %d{HH:mm:ss.SSS} %-5level [%thread] %logger{128} - %msg%n
+                %d{HH:mm:ss.SSS} %-5level [%thread] %logger{128} - %msg %ex %n
             </pattern>
         </encoder>
     </appender>
 
-    <root level="DEBUG">
+    <appender name="STASH" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="net.logstash.logback.encoder.LogstashEncoder"/>
+    </appender>
+
+    <root level="INFO">
         <appender-ref ref="STDOUT" />
+        <appender-ref ref="STASH" />
     </root>
 </configuration>

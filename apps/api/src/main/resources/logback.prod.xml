@@ -1,17 +1,9 @@
 <configuration scan="true" scanPeriod="60 seconds">
-    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
-        <encoder>
-            <pattern>
-                %d{HH:mm:ss.SSS} %-5level [%thread] %logger{128} - %msg%n
-            </pattern>
-        </encoder>
-    </appender>
-
     <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>${LOGS_DIR}/otus-sales-leads-generator-app-api-${MODE}.log</file>
-        <encoder>
+        <encoder class="net.logstash.logback.encoder.LogstashEncoder">
             <pattern>
-                %date %-5level [%thread] %logger{128} - %msg%n
+                %date %-5level [%thread] %logger{128} - %msg %ex %n
             </pattern>
         </encoder>
         <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">

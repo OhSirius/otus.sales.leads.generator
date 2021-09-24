@@ -8,25 +8,17 @@ import org.http4s.blaze.server.BlazeServerBuilder
 import org.http4s.syntax.kleisli._
 import ru.otus.sales.leads.generator.apps.api.api.{SwaggerApi, UserApi}
 import ru.otus.sales.leads.generator.apps.api.config.{ApiConfig, Configuration}
-import ru.otus.sales.leads.generator.inf.repository.config.DbConfiguration.DbConfiguration
-import zio.console.Console
-import ru.otus.sales.leads.generator.inf.repository.config.DbConfiguration
+import ru.otus.sales.leads.generator.apps.api.logging.Logger
 import ru.otus.sales.leads.generator.inf.repository.transactors.{DBTransactor, DbHikariTransactor}
 import ru.otus.sales.leads.generator.services.cores.users.bootstrap.UserRegConfig
 import ru.otus.sales.leads.generator.services.cores.users.services.UserRegService.UserRegService
-import sttp.tapir.json.circe._
-import sttp.tapir.generic.auto._
-import sttp.tapir.server.http4s.ztapir.ZHttp4sServerInterpreter
-import sttp.tapir.swagger.http4s.SwaggerHttp4s
 import zio.blocking.Blocking
-//import sttp.tapir.swagger.SwaggerUI
-import sttp.tapir.ztapir._
+import zio.logging.Logging
 import zio.clock.Clock
 import zio.interop.catz._
 import zio.{App, ExitCode, IO, RIO, UIO, URIO, ZEnv, ZIO}
 import cats.effect.{ExitCode => CatsExitCode}
 
-//https://github.com/softwaremill/tapir/tree/master/examples/src/main/scala/sttp/tapir/examples
 object WebApp extends App {
 
   type AppEnvironment = UserRegService
@@ -34,12 +26,12 @@ object WebApp extends App {
     with Clock
     with Blocking
     with Configuration
-    with Console
+    with Logging
 
   type AppTask[A] = RIO[AppEnvironment, A]
 
   val appEnvironment =
-    Configuration.live >+> Blocking.live >+> DbHikariTransactor.live >+> UserRegConfig.live
+    Logger.liveWithMdc >+> Configuration.live >+> Blocking.live >+> DbHikariTransactor.live >+> UserRegConfig.live
 
   val httApp = Router[AppTask](
     "/" -> new UserApi[AppEnvironment]().registerRoutes,
@@ -48,19 +40,18 @@ object WebApp extends App {
 
   val program = for {
     config <- ZIO.service[ApiConfig]
-    server <- ZIO.runtime[AppEnvironment].flatMap {
-      implicit runtime => // This is needed to derive cats-effect instances for that are needed by http4s
-        BlazeServerBuilder[AppTask](
-          runtime.platform.executor.asEC
-        )
-          .bindHttp(config.port, config.host)
-          .withHttpApp(httApp) //<+>
-          .serve
-          .compile[AppTask, AppTask, CatsExitCode]
-          .drain
+    server <- ZIO.runtime[AppEnvironment].flatMap { implicit runtime =>
+      BlazeServerBuilder[AppTask](
+        runtime.platform.executor.asEC
+      )
+        .bindHttp(config.port, config.host)
+        .withHttpApp(httApp)
+        .serve
+        .compile[AppTask, AppTask, CatsExitCode]
+        .drain
     }
   } yield server
 
-  override def run(args: List[String]): URIO[zio.ZEnv, ExitCode] =
-    program.provideSomeLayer[zio.ZEnv](appEnvironment).exitCode
+  override def run(args: List[String]): URIO[ZEnv, ExitCode] =
+    program.provideSomeLayer[ZEnv](appEnvironment).exitCode
 }
