@@ -25,6 +25,13 @@ class AuthApi {
       //.in(auth.apiKey(header[BotId]("X-Auth-Token")))
       .in(header[BotId]("X-Auth-Token"))
       .errorOut(jsonBody[ErrorInfo[T]].description("Модель ошибки"))
+
+  def authorize[R <: UserLoginService with DBTransactor with Logging, E](
+      botId: BotId): ZIO[R, ErrorInfo[E], User] = UserLoginService
+    .login(UserLogin(botId.id))
+    .orElseFail(ErrorInfo[E]("Не авторизован", Unauthorized))
+}
+
 //      .errorOut(
 //        stringBody
 //          .description("An error message when authentication failed")
@@ -33,9 +40,3 @@ class AuthApi {
 //      .in(auth.apiKey(cookie[String]("Token")).mapTo(AuthToken))
 //      .in("api" / "1.0")
 //      .errorOut(error)
-
-  def authorize[R <: UserLoginService with DBTransactor with Logging, E](
-      botId: BotId): ZIO[R, ErrorInfo[E], User] = UserLoginService
-    .login(UserLogin(botId.id))
-    .orElseFail(ErrorInfo[E]("Не авторизован", Unauthorized))
-}

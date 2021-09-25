@@ -4,7 +4,7 @@ package models
 import ru.otus.sales.leads.generator.data.domain.entities.LeadId
 
 case class LeadView(
-    id: Option[LeadId],
+    id: LeadViewId, //Option[LeadId],
     fullName: LeadViewFullName,
     phone: LeadViewPhone,
     price: BigDecimal)
