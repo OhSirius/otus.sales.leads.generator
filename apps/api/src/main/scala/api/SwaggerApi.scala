@@ -14,7 +14,8 @@ object SwaggerApi {
       .toOpenAPI(
         List(
           new UserApi[AppEnvironment].registerEndpoint,
-          new LeadApi[AppEnvironment].createEndpoint),
+          new LeadApi[AppEnvironment].createEndpoint,
+          new LeadApi[AppEnvironment].getActiveEndpoint),
         "CRM",
         "1.0")
       .toYaml

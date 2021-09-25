@@ -19,6 +19,8 @@ import ru.otus.sales.leads.generator.services.cores.leads.repositories.LeadRepos
 import ru.otus.sales.leads.generator.services.cores.leads.repositories.PersonRepository.PersonRepository
 import ru.otus.sales.leads.generator.services.cores.leads.validators.LeadValidator.LeadValidator
 
+import java.util.Date
+
 object LeadService {
   type LeadService = Has[Service]
 
@@ -45,9 +47,9 @@ object LeadService {
           person <- personRepo
             .findBy(info.fullName, info.phone)
             .flatMap(p =>
-              p.fold(personRepo.create(Person(None, info.fullName, info.phone)))(
+              p.fold(personRepo.create(Person(None, info.fullName, info.phone, new Date())))(
                 IO.pure(_).to[Result]))
-          lead <- leadRepo.create(Lead(None, person, user, info.price))
+          lead <- leadRepo.create(Lead(None, person, user, info.price, new Date()))
         } yield lead)
           .transact(trans)
           .tapCause(Logging.error("Создание лида", _))

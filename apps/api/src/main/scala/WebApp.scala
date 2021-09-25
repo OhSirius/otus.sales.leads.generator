@@ -21,15 +21,17 @@ import cats.effect.{ExitCode => CatsExitCode}
 import ru.otus.sales.leads.generator.services.cores.leads.bootstrap.LeadConfig
 import ru.otus.sales.leads.generator.services.cores.leads.services.LeadService.LeadService
 import ru.otus.sales.leads.generator.services.cores.users.services.UserLoginService.UserLoginService
+import ru.otus.sales.leads.generator.services.ui.leads.bootstrap.LeadViewConfig
 
 object WebApp extends App {
   val appEnvironment =
     Logger.liveWithMdc >+> Configuration.live >+> Blocking.live >+> DbHikariTransactor.live >+>
-      UserRegConfig.live >+> UserLoginConfig.live >+> LeadConfig.live
+      UserRegConfig.live >+> UserLoginConfig.live >+> LeadConfig.live >+> LeadViewConfig.live
 
   val httApp = Router[AppTask](
     "/" -> new UserApi[AppEnvironment]().registerRoutes,
     "/" -> new LeadApi[AppEnvironment]().createRoutes,
+    "/" -> new LeadApi[AppEnvironment]().getActiveRoutes,
     "/" -> SwaggerApi.routes
   ).orNotFound
 

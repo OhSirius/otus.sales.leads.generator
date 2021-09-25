@@ -5,6 +5,7 @@ import ru.otus.sales.leads.generator.inf.repository.transactors.DBTransactor
 import ru.otus.sales.leads.generator.services.cores.leads.services.LeadService.LeadService
 import ru.otus.sales.leads.generator.services.cores.users.services.UserLoginService.UserLoginService
 import ru.otus.sales.leads.generator.services.cores.users.services.UserRegService.UserRegService
+import ru.otus.sales.leads.generator.services.ui.leads.services.LeadViewService.LeadViewService
 import zio.RIO
 import zio.blocking.Blocking
 import zio.clock.Clock
@@ -19,6 +20,7 @@ package object api {
     with Logging
     with UserLoginService
     with LeadService
+    with LeadViewService
 
   type AppTask[A] = RIO[AppEnvironment, A]
 }
