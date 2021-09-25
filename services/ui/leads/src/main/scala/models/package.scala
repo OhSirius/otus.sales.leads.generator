@@ -4,4 +4,5 @@ package object models {
   type LeadViewId = Int
   type LeadViewFullName = String
   type LeadViewPhone = String
+  type LeadViewTop = Int
 }
