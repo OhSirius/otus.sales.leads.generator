@@ -2,11 +2,7 @@ package ru.otus.sales.leads.generator.services.cores.bot
 package services
 
 import canoe.api._
-import canoe.models.ParseMode
-import canoe.models.outgoing.{ContactContent, TextContent}
 import canoe.syntax._
-import cats.Monad
-import cats.effect.{ExitCode, IOApp, Sync}
 import ru.otus.sales.leads.generator.services.cores.bot.config.BotApiConfiguration.{
   BotApiConfig,
   BotApiConfiguration
@@ -21,16 +17,10 @@ import ru.otus.sales.leads.generator.services.cores.users.models.UserRegError.{
 import sttp.model.Uri
 import zio.RIO
 import zio.logging.Logging
-//import cats.implicits.{catsSyntaxApplicativeId, toFlatMapOps}
-import cats.syntax.functor._
-import fs2.Stream
-import ru.otus.sales.leads.generator.inf.common.models
 import ru.otus.sales.leads.generator.inf.common.models.ErrorInfo
 import ru.otus.sales.leads.generator.services.cores.users.endpoints.UserEndpoint
 import ru.otus.sales.leads.generator.services.cores.users.models.{UserReg, UserRegError}
 import zio.{Has, IO, RIO, Task, ULayer, ZIO, ZLayer}
-import zio.interop.catz._
-import sttp.client3._
 import sttp.tapir.client.sttp.SttpClientInterpreter
 import cats.implicits.catsSyntaxApply
 
@@ -88,9 +78,6 @@ object BotRegService {
       config <- ZIO.service[BotApiConfig]
       client = SttpClientInterpreter.toQuickClient(
         UserEndpoint.register,
-        //Some(uri"http://localhost:4080")
-        //Some(Uri.unsafeApply(config.uri))
-        //Some(Uri.parse(config.uri).fold(Uri.))
         Some(Uri.unsafeApply(config.host, config.port))
       ) // uri""/
       res <- RIO
@@ -109,28 +96,4 @@ object BotRegService {
 
   val live: ULayer[BotRegService] =
     ZLayer.succeed[BotRegService.Service](new ServiceImpl)
-
-//  def register(
-//      info: LeadInfo,
-//      user: User): ZIO[LeadService with DBTransactor with Logging, ::[LeadError], Unit] =
-//    ZIO.accessM(_.get.create(info, user))
-
-//  trait Service {
-//    def register(implicit T: TelegramClient[Task]): Scenario[Task, Unit]
-//  }
-//
-//  class ServiceImpl extends Service {
-//
-//    override def register(implicit T: TelegramClient[Task]): Scenario[Task, Unit] =
-//      for {
-//        chat <- Scenario.expect(command("register").chat)
-//        mess <- Scenario.expect(textMessage)
-//        //id <- Scenario.eval(chat.send(ContactContent("123123", "sdfsdf"), Option(1)))
-//        //_    <- Scenario.eval(chat.send(TextContent("<html><h1>eeeee</h1></html>", Option(ParseMode.HTML))))
-//        _ <- Scenario.eval(chat.send(s"Nice to meet you, ${mess.from}"))
-//      } yield ()
-//  }
-//
-//  val live: ULayer[BotRegService] =
-//    ZLayer.succeed(new ServiceImpl)
 }

@@ -1,36 +1,45 @@
 package ru.otus.sales.leads.generator.apps.bot
 
-import canoe.api._
-import canoe.models.messages.{AnimationMessage, StickerMessage, TelegramMessage, TextMessage}
-import canoe.syntax._
-import cats.effect.{ExitCode, IO, IOApp}
-import cats.syntax.functor._
+import canoe.api.{Bot, Scenario, TelegramClient}
 import fs2.Stream
+import org.http4s.client.blaze.BlazeClientBuilder
+import ru.otus.sales.leads.generator.apps.bot.config.{AppConfig, BotConfig, Configuration}
+import ru.otus.sales.leads.generator.apps.bot.logging.Logger
+import ru.otus.sales.leads.generator.services.cores.bot.config.BotApiConfiguration.BotApiConfig
+import ru.otus.sales.leads.generator.services.cores.bot.services.BotRegService
+import ru.otus.sales.leads.generator.services.cores.bot.services.BotRegService.BotRegService
+import zio.blocking.Blocking
+import zio.logging.Logging
+import zio.clock.Clock
+import zio.interop.catz._
+import zio.{App, ExitCode, IO, RIO, UIO, URIO, ZEnv, ZIO}
+import cats.effect.{ExitCode => CatsExitCode}
 
-object BotApp extends IOApp {
-  val token: String =
-    "1967675782:AAHX6RgBeQktXWB3J9okfi2cBe28BhAwwPI" //https://web.telegram.org/z/#1967675782 //https://t.me/pav_test_bot
+object BotApp extends App {
+  type AppEnvironment = BotRegService with Configuration with Clock with Blocking with Logging
+  type AppTask[A] = RIO[AppEnvironment, A]
 
-  def run(args: List[String]): IO[ExitCode] =
-    Stream
-      .resource(TelegramClient.global[IO](token))
-      .flatMap { implicit client =>
-        Bot.polling[IO].follow(echos)
-      }
-      .compile
-      .drain
-      .as(ExitCode.Success)
+  val appEnvironment =
+    Logger.liveWithMdc >+> Clock.live >+> Configuration.live >+> BotRegService.live
 
-  def echos[F[_]: TelegramClient]: Scenario[F, Unit] =
-    for {
-      msg <- Scenario.expect(any)
-      _ <- Scenario.eval(echoBack(msg))
-    } yield ()
+  val program = for {
+    botConfig <- ZIO.service[BotConfig]
+    apiConfig <- ZIO.service[BotApiConfig]
+    _ <- Logging.info(s"Запускаем телеграм бота с настройками: $botConfig и $apiConfig")
+    regService <- ZIO.service[BotRegService.Service]
+    server <- ZIO.runtime[AppEnvironment].flatMap { implicit runtime =>
+      Stream
+        .resource(BlazeClientBuilder[AppTask](runtime.platform.executor.asEC).resource)
+        .map(TelegramClient.fromHttp4sClient[AppTask](botConfig.token)(_))
+        .flatMap { implicit client =>
+          Bot.polling[AppTask].follow(regService.register[AppEnvironment])
+        }
+        .compile
+        .drain
+    }
+  } yield server
 
-  def echoBack[F[_]: TelegramClient](msg: TelegramMessage): F[_] = msg match {
-    case textMessage: TextMessage => msg.chat.send(textMessage.text)
-    case animationMessage: AnimationMessage => msg.chat.send(animationMessage.animation)
-    case stickerMessage: StickerMessage => msg.chat.send(stickerMessage.sticker)
-    case _ => msg.chat.send("Sorry! I can't echos that back.")
-  }
+  override def run(args: List[String]): URIO[ZEnv, ExitCode] =
+    program.provideSomeLayer[ZEnv](appEnvironment).exitCode
+
 }
