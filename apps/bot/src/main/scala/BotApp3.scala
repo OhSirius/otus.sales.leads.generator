@@ -12,6 +12,9 @@ import org.http4s._
 import org.http4s.client.blaze.BlazeClientBuilder
 import org.http4s.server.Router
 import ru.otus.sales.leads.generator.apps.bot.BotApp.echos
+import ru.otus.sales.leads.generator.apps.bot.config.{AppConfig, BotConfig, Configuration}
+import ru.otus.sales.leads.generator.apps.bot.logging.Logger
+import ru.otus.sales.leads.generator.services.cores.bot.config.BotApiConfiguration.BotApiConfig
 import ru.otus.sales.leads.generator.services.cores.bot.services.BotRegService
 import ru.otus.sales.leads.generator.services.cores.bot.services.BotRegService.BotRegService
 import zio.{Has, ULayer, ZLayer}
@@ -37,12 +40,12 @@ import canoe.api._
 object WebApp3 extends App {
   val token: String =
     "1967675782:AAHX6RgBeQktXWB3J9okfi2cBe28BhAwwPI"
-  type AppEnvironment = BotRegService with Clock with Blocking
+  type AppEnvironment = BotRegService with Configuration with Clock with Blocking with Logging
 
   type AppTask[A] = RIO[AppEnvironment, A]
 
-  val appEnvironment: ZLayer[Any, Nothing, Clock with BotRegService] =
-    Clock.live >+> BotRegService.live
+  val appEnvironment =
+    Logger.liveWithMdc >+> Clock.live >+> Configuration.live >+> BotRegService.live
 //    Logger.liveWithMdc >+> Configuration.live >+> Blocking.live >+> DbHikariTransactor.live >+>
 //      UserRegConfig.live >+> UserLoginConfig.live >+> LeadConfig.live >+> LeadViewConfig.live
 
@@ -54,13 +57,16 @@ object WebApp3 extends App {
 //  ).orNotFound
 
   val program = for {
-    test <- ZIO.service[BotRegService.Service]
+    botConfig <- ZIO.service[BotConfig]
+    apiConfig <- ZIO.service[BotApiConfig]
+    _ <- Logging.info(s"Запускаем телеграм бота с настройками: $botConfig и $apiConfig")
+    regService <- ZIO.service[BotRegService.Service]
     server <- ZIO.runtime[AppEnvironment].flatMap { implicit runtime =>
       Stream
         .resource(BlazeClientBuilder[AppTask](runtime.platform.executor.asEC).resource)
         .map(TelegramClient.fromHttp4sClient[AppTask](token)(_))
         .flatMap { implicit client =>
-          Bot.polling[AppTask].follow(test.register) //[AppEnvironment]
+          Bot.polling[AppTask].follow(regService.register[AppEnvironment]) //[AppEnvironment]
         }
         //.serve
         .compile //[AppTask, AppTask, CatsExitCode]

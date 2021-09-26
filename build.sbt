@@ -79,6 +79,7 @@ lazy val telegramBot = (project in file("apps/bot"))
     scalaVersion := _scalaVersion,
     idePackagePrefix := _idePackagePrefix.map(_ + ".apps.bot"),
     scalacOptions ++= _scalacOptions,
+    libraryDependencies ++= pureconfig,
     libraryDependencies ++= logback,
     libraryDependencies ++= serverTapir,
     //libraryDependencies += "org.http4s" %% "http4s-blaze-client" % "0.22.0",
