@@ -87,13 +87,48 @@ object BotViewLeadService {
 //                      lead.fullName,
 //                      Some(lead.id.toString),
 //                      Some(lead.price.toString())))))
-            Scenario.eval(
-              chat.send(
-                ContactContent(
-                  leads.head.phone,
-                  leads.head.fullName,
-                  Some(s"№${leads.head.id}, цена ${leads.head.price}"),
-                  Some(leads.head.price.toString()))))
+//            Scenario.eval(
+//              chat.send(
+//                ContactContent(
+//                  leads.head.phone,
+//                  leads.head.fullName,
+//                  Some(s"№${leads.head.id}, цена ${leads.head.price}"),
+//                  Some(leads.head.price.toString()))))
+//            leads
+//              .map(lead =>
+//                Scenario.eval(
+//                  chat.send(
+//                    ContactContent(
+//                      lead.phone,
+//                      lead.fullName,
+//                      Some(s"№${leads.head.id}, цена ${leads.head.price}"),
+//                      Some(lead.price.toString())))))
+//              .fold(Scenario.eval[RIO[R, *], Unit](Logging.info(s"Список лидов:")))((a, b) =>
+//                a *> b)
+            //Scenario.eval[RIO[R, *], Unit](Logging.info(s"WTF $leads")) *>
+
+//            leads
+//              .map(lead =>
+//                Scenario.eval(
+//                  chat.send(
+//                    ContactContent(
+//                      lead.phone,
+//                      lead.fullName,
+//                      Some(s"№${lead.id}, цена ${lead.price}"),
+//                      Some(lead.price.toString())))))
+//              .fold(Scenario.eval[RIO[R, *], Unit](Logging.info(s"Список лидов:")))(_ *> _)
+            leads
+              .map(lead =>
+                Scenario.eval(chat.send(ContactContent(
+                  lead.phone,
+//                      lead.fullName,
+//                      Some(s"№${lead.id}, цена ${lead.price}"),
+                  s"№${lead.id}, цена ${lead.price},",
+                  Some(lead.fullName),
+                  //Some(lead.price.toString())
+                  None
+                ))))
+              .fold(Scenario.pure[RIO[R, *]](ZIO.none))(_ *> _)
         )
         _ <- Scenario.eval[RIO[R, *], Unit](Logging.info(s"Завершение получения лидов"))
       } yield ()
