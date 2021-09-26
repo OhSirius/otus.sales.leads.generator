@@ -31,7 +31,7 @@ lazy val webApi = (project in file("apps/api"))
     idePackagePrefix := _idePackagePrefix.map(_ + ".apps.api"),
     addCompilerPlugin(kindProjector),
     scalacOptions ++= _scalacOptions,
-    libraryDependencies ++= tapir,
+    libraryDependencies ++= serverTapir,
     libraryDependencies ++= zio,
     libraryDependencies ++= pureconfig,
     libraryDependencies ++= logback,
@@ -80,6 +80,9 @@ lazy val telegramBot = (project in file("apps/bot"))
     idePackagePrefix := _idePackagePrefix.map(_ + ".apps.bot"),
     scalacOptions ++= _scalacOptions,
     libraryDependencies ++= logback,
+    libraryDependencies ++= serverTapir,
+    //libraryDependencies += "org.http4s" %% "http4s-blaze-client" % "0.22.0",
+    //libraryDependencies ++= clientTapir,
     libraryDependencies ++= Seq(
       bot
     ),
@@ -115,7 +118,7 @@ lazy val telegramBot = (project in file("apps/bot"))
     }
     //logLevel in assembly := Level.Debug
   )
-  .dependsOn(common)
+  .dependsOn(common, botService)
   .enablePlugins(AssemblyPlugin)
 
 //Сервисы
@@ -128,7 +131,8 @@ lazy val userService = (project in file("services/cores/users"))
     idePackagePrefix := _idePackagePrefix.map(_ + ".services.cores.users"),
     libraryDependencies ++= doobie,
     libraryDependencies ++= zio,
-    libraryDependencies ++= logback
+    libraryDependencies ++= logback,
+    libraryDependencies ++= commonTapir
   )
   .dependsOn(entityRepository, common, data)
 
@@ -141,7 +145,8 @@ lazy val leadService = (project in file("services/cores/leads"))
     idePackagePrefix := _idePackagePrefix.map(_ + ".services.cores.leads"),
     libraryDependencies ++= doobie,
     libraryDependencies ++= zio,
-    libraryDependencies ++= logback
+    libraryDependencies ++= logback,
+    libraryDependencies ++= commonTapir
   )
   .dependsOn(entityRepository, common, data)
 
@@ -154,18 +159,25 @@ lazy val leadUiService = (project in file("services/ui/leads"))
     idePackagePrefix := _idePackagePrefix.map(_ + ".services.ui.leads"),
     libraryDependencies ++= doobie,
     libraryDependencies ++= zio,
-    libraryDependencies ++= logback
+    libraryDependencies ++= logback,
+    libraryDependencies ++= commonTapir
   )
   .dependsOn(entityRepository, common, data)
 
-lazy val botService = (project in file("services/cores/bot")).settings(
-  name := "otus.sales.leads.generator.services.core.bot",
-  scalaVersion := _scalaVersion,
-  version := _version,
-  scalacOptions ++= _scalacOptions,
-  idePackagePrefix := _idePackagePrefix.map(_ + ".services.cores.bot"),
-  libraryDependencies ++= logback
-)
+lazy val botService = (project in file("services/cores/bot"))
+  .settings(
+    name := "otus.sales.leads.generator.services.core.bot",
+    scalaVersion := _scalaVersion,
+    version := _version,
+    scalacOptions ++= _scalacOptions,
+    idePackagePrefix := _idePackagePrefix.map(_ + ".services.cores.bot"),
+    libraryDependencies ++= logback,
+    libraryDependencies ++= clientTapir,
+    libraryDependencies ++= Seq(
+      bot
+    )
+  )
+  .dependsOn(common, data, userService, leadService, leadUiService)
 
 //Данные
 lazy val data = (project in file("data/domain"))
@@ -200,7 +212,8 @@ lazy val common = (project in file("inf/common")).settings(
   scalaVersion := _scalaVersion,
   version := _version,
   scalacOptions ++= _scalacOptions,
-  idePackagePrefix := _idePackagePrefix.map(_ + ".inf.common")
+  idePackagePrefix := _idePackagePrefix.map(_ + ".inf.common"),
+  libraryDependencies ++= commonTapir
 )
 
 lazy val entityRepository = (project in file("inf/repository")).settings(

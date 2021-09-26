@@ -8,7 +8,7 @@ object Deps {
     lazy val KindProjector = "0.13.0"
     lazy val Logback = "1.2.6"
     lazy val Doobie = "0.13.4"
-    lazy val Tapir = "0.18.3"
+    lazy val Tapir = "0.17.4" //"0.18.3"
     lazy val TelegramBot = "0.5.1"
     lazy val Zio = "1.0.11"
     lazy val Postgres = "42.2.20"
@@ -45,7 +45,19 @@ object Deps {
   )
 
   //tapir
-  lazy val tapir: Seq[ModuleID] = Seq(
+  lazy val commonTapir: Seq[ModuleID] = Seq(
+    "com.softwaremill.sttp.tapir" %% "tapir-zio" % V.Tapir,
+    "com.softwaremill.sttp.tapir" %% "tapir-json-circe" % V.Tapir,
+    "io.circe" %% "circe-generic" % "0.13.0"
+  )
+
+  lazy val clientTapir: Seq[ModuleID] = Seq(
+    "com.softwaremill.sttp.tapir" %% "tapir-zio" % V.Tapir,
+    "com.softwaremill.sttp.tapir" %% "tapir-json-circe" % V.Tapir,
+    "com.softwaremill.sttp.tapir" %% "tapir-sttp-client" % V.Tapir
+  )
+
+  lazy val serverTapir: Seq[ModuleID] = Seq(
     "com.softwaremill.sttp.tapir" %% "tapir-zio" % V.Tapir,
     "com.softwaremill.sttp.tapir" %% "tapir-zio-http4s-server" % V.Tapir,
     "com.softwaremill.sttp.tapir" %% "tapir-json-circe" % V.Tapir,
@@ -53,10 +65,12 @@ object Deps {
     "com.softwaremill.sttp.tapir" %% "tapir-openapi-docs" % V.Tapir,
     "com.softwaremill.sttp.tapir" %% "tapir-openapi-circe" % V.Tapir,
     "com.softwaremill.sttp.tapir" %% "tapir-openapi-circe-yaml" % V.Tapir
+    //"com.softwaremill.sttp.tapir" %% "tapir-http4s-client" % V.Tapir
   )
 
   //bot
-  lazy val bot = "org.augustjune" %% "canoe" % V.TelegramBot
+  lazy val bot =
+    "org.augustjune" %% "canoe" % V.TelegramBot //.exclude("org.http4s", "*") //:http4s-dsl
 
   //zio
   lazy val zio: Seq[ModuleID] = Seq(

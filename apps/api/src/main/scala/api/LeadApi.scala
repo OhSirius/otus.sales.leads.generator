@@ -16,36 +16,27 @@ import sttp.tapir.ztapir._
 import io.circe.generic.auto._
 import org.http4s.HttpRoutes
 import ru.otus.sales.leads.generator.apps.api.logging.Logger.botId
-import ru.otus.sales.leads.generator.apps.api.models.ErrorInfo
 import ru.otus.sales.leads.generator.data.domain.entities.{BotId, LeadId, User}
+import ru.otus.sales.leads.generator.inf.common.models.{AuthId, ErrorInfo}
+import ru.otus.sales.leads.generator.services.cores.leads.endpoints.LeadEndpoint
 import ru.otus.sales.leads.generator.services.cores.leads.services.LeadService
 import ru.otus.sales.leads.generator.services.cores.users.models.UserLogin
+import ru.otus.sales.leads.generator.services.ui.leads.endpoints.LeadViewEndpoint
 import ru.otus.sales.leads.generator.services.ui.leads.models.{LeadView, LeadViewError, LeadViewTop}
 import ru.otus.sales.leads.generator.services.ui.leads.services.LeadViewService.LeadViewService
 import sttp.model.StatusCode.{BadRequest, Unauthorized}
 import zio.{IO, RIO, UIO, ZIO}
 import ru.otus.sales.leads.generator.services.ui.leads.services.LeadViewService
-
+import zio.interop.catz._
 import java.util.UUID
 
 class LeadApi[
     R <: LeadViewService with UserLoginService with LeadService with DBTransactor with Logging]
     extends AuthApi {
 
-  val createEndpoint: ZEndpoint[(BotId, LeadInfo), ErrorInfo[LeadError], Boolean] =
-    authEndpoint[LeadError]
-      .description("Создание лида")
-      .post
-      .in("leads" / "create")
-      .in(
-        jsonBody[LeadInfo]
-          .description("Модель лида")
-          .example(LeadInfo("Павлычев Александр", "89202921268", 156.1)))
-      .out(plainBody[Boolean])
-
-  val createServerEndpoint: ZServerEndpoint[R, (BotId, LeadInfo), ErrorInfo[LeadError], Boolean] =
-    createEndpoint
-      .zServerLogicPart[R, BotId, LeadInfo, User](authorize(_))
+  val createServerEndpoint: ZServerEndpoint[R, (AuthId, LeadInfo), ErrorInfo[LeadError], Boolean] =
+    LeadEndpoint.create
+      .zServerLogicPart[R, AuthId, LeadInfo, User](authorize(_))
       .andThen { case (user, info) =>
         for {
           correlationId <- UIO(Some(UUID.randomUUID()))
@@ -57,24 +48,14 @@ class LeadApi[
       }
 
   val createRoutes: HttpRoutes[ZIO[R with Clock, Throwable, *]] =
-    ZHttp4sServerInterpreter[R]()
+    ZHttp4sServerInterpreter
       .from(createServerEndpoint)
       .toRoutes
 
-  val getActiveEndpoint: ZEndpoint[(BotId, LeadViewTop), ErrorInfo[LeadViewError], List[LeadView]] =
-    authEndpoint[LeadViewError]
-      .description("Активные лиды")
-      .get
-      .in("leads" / "active" / query[LeadViewTop]("top").description("Количество лидов"))
-      .out(
-        jsonBody[List[LeadView]]
-          .description("Список активных лидов")
-          .example(List(LeadView(1, "Павлычев Александр", "89202921268", 13.2))))
-
   val getActiveServerEndpoint
-      : ZServerEndpoint[R, (BotId, LeadViewTop), ErrorInfo[LeadViewError], List[LeadView]] =
-    getActiveEndpoint
-      .zServerLogicPart[R, BotId, LeadViewTop, User](authorize(_)) //
+      : ZServerEndpoint[R, (AuthId, LeadViewTop), ErrorInfo[LeadViewError], List[LeadView]] =
+    LeadViewEndpoint.getActive
+      .zServerLogicPart[R, AuthId, LeadViewTop, User](authorize(_)) //
       .andThen { case (user, top) =>
         for {
           correlationId <- UIO(Some(UUID.randomUUID()))
@@ -88,7 +69,7 @@ class LeadApi[
       }
 
   val getActiveRoutes: HttpRoutes[ZIO[R with Clock, Throwable, *]] =
-    ZHttp4sServerInterpreter[R]()
+    ZHttp4sServerInterpreter
       .from(getActiveServerEndpoint)
       .toRoutes
 

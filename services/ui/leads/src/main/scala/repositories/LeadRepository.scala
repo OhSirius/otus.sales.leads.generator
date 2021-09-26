@@ -34,11 +34,9 @@ object LeadRepository {
             .take(lift(top))
             .filter({ case (lead, _) => lead.user == lift(userId) })
             .sortBy({ case (lead, _) => lead.createDate })(Ord.desc)
-            .map({ case (lead, person) =>
-              lead.id.map(leadId => (leadId, person.fullName, person.phone, lead.price))
-            }))
-        .map(_.filter(!_.isEmpty).map(_.get match {
-          case (leadId, fullName, phone, price) => LeadView(leadId.id, fullName, phone, price)
+            .map({ case (lead, person) => (lead.id, person.fullName, person.phone, lead.price) }))
+        .map(_.collect({ case (Some(leadId), fullName, phone, price) =>
+          LeadView(leadId.id, fullName, phone, price)
         }))
     } yield lead
   }

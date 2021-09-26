@@ -1,0 +1,22 @@
+<configuration scan="true" scanPeriod="60 seconds">
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOGS_DIR}/otus-sales-leads-generator-app-bot-${MODE}.log</file>
+        <encoder class="net.logstash.logback.encoder.LogstashEncoder">
+            <pattern>
+                %date %-5level [%thread] %logger{128} - %msg %ex %n
+            </pattern>
+        </encoder>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>
+                ${LOGS_DIR}/otus-sales-leads-generator-app-bot-${MODE}-%d{yyyy-MM-dd}.%i.log.gz
+            </fileNamePattern>
+            <maxFileSize>50MB</maxFileSize>
+            <maxHistory>10</maxHistory>
+            <totalSizeCap>3GB</totalSizeCap>
+        </rollingPolicy>
+    </appender>
+
+    <root level="INFO">
+        <appender-ref ref="FILE" />
+    </root>
+</configuration>
