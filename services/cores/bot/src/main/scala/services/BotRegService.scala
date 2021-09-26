@@ -37,7 +37,7 @@ object BotRegService {
 
     override def register[
         R <: BotApiConfiguration with Logging
-    ](implicit T: TelegramClient[RIO[R, *]]): Scenario[RIO[R, *], Unit] = //
+    ](implicit TС: TelegramClient[RIO[R, *]]): Scenario[RIO[R, *], Unit] = //
       for {
         _ <- Scenario.eval[RIO[R, *], Unit](Logging.info(s"Начало регистрации пользователя"))
         chat <- Scenario.expect(command("register").chat)
@@ -47,9 +47,9 @@ object BotRegService {
           .eval(
             registerUser[R](
               UserReg(
-                mess.from.get.firstName,
-                mess.from.get.lastName.getOrElse(" "),
-                mess.from.get.id)))
+                mess.from.map(_.firstName).getOrElse(""),
+                mess.from.flatMap(_.lastName).getOrElse(""),
+                mess.from.map(_.id).getOrElse(-1))))
           .attempt
         _ <- res.fold(
           {

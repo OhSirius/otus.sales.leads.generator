@@ -15,9 +15,11 @@ object LeadValidator {
   class ServiceImpl extends Service {
     override def validate(info: LeadInfo): IO[::[LeadError], Unit] = for {
       ref <- Ref.make(List.empty[LeadError])
-      _ <- (if (info.fullName.isNullOrEmpty) ref.update(LeadError.EmptyFullname :: _)
+      _ <- (if (info.fullName.isNullOrEmpty || info.fullName.length > 256)
+              ref.update(LeadError.EmptyFullname :: _)
             else ZIO.none) *>
-        (if (info.phone.isNullOrEmpty) ref.update(LeadError.EmptyPhone :: _)
+        (if (info.phone.isNullOrEmpty || info.phone.length > 128)
+           ref.update(LeadError.EmptyPhone :: _)
          else ZIO.none) *>
         (if (info.price <= 0) ref.update(LeadError.BadPrice(info.price) :: _) else ZIO.none)
       errors <- ref.get
