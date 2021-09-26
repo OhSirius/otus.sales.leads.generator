@@ -6,7 +6,11 @@ import org.http4s.client.blaze.BlazeClientBuilder
 import ru.otus.sales.leads.generator.apps.bot.config.{AppConfig, BotConfig, Configuration}
 import ru.otus.sales.leads.generator.apps.bot.logging.Logger
 import ru.otus.sales.leads.generator.services.cores.bot.config.BotApiConfiguration.BotApiConfig
-import ru.otus.sales.leads.generator.services.cores.bot.services.{BotLeadService, BotRegService}
+import ru.otus.sales.leads.generator.services.cores.bot.services.{
+  BotLeadService,
+  BotRegService,
+  BotViewLeadService
+}
 import ru.otus.sales.leads.generator.services.cores.bot.services.BotRegService.BotRegService
 import zio.blocking.Blocking
 import zio.logging.Logging
@@ -15,9 +19,11 @@ import zio.interop.catz._
 import zio.{App, ExitCode, IO, RIO, UIO, URIO, ZEnv, ZIO}
 import cats.effect.{ExitCode => CatsExitCode}
 import ru.otus.sales.leads.generator.services.cores.bot.services.BotLeadService.BotLeadService
+import ru.otus.sales.leads.generator.services.cores.bot.services.BotViewLeadService.BotViewLeadService
 
 object BotApp extends App {
-  type AppEnvironment = BotLeadService
+  type AppEnvironment = BotViewLeadService
+    with BotLeadService
     with BotRegService
     with Configuration
     with Clock
@@ -26,7 +32,7 @@ object BotApp extends App {
   type AppTask[A] = RIO[AppEnvironment, A]
 
   val appEnvironment =
-    Logger.liveWithMdc >+> Clock.live >+> Configuration.live >+> BotRegService.live >+> BotLeadService.live
+    Logger.liveWithMdc >+> Clock.live >+> Configuration.live >+> BotRegService.live >+> BotLeadService.live >+> BotViewLeadService.live
 
   val program = for {
     botConfig <- ZIO.service[BotConfig]
@@ -34,6 +40,7 @@ object BotApp extends App {
     _ <- Logging.info(s"Запускаем телеграм бота с настройками: $botConfig и $apiConfig")
     regService <- ZIO.service[BotRegService.Service]
     leadService <- ZIO.service[BotLeadService.Service]
+    leadViewService <- ZIO.service[BotViewLeadService.Service]
     server <- ZIO.runtime[AppEnvironment].flatMap { implicit runtime =>
       Stream
         .resource(BlazeClientBuilder[AppTask](runtime.platform.executor.asEC).resource)
@@ -41,7 +48,10 @@ object BotApp extends App {
         .flatMap { implicit client =>
           Bot
             .polling[AppTask]
-            .follow(regService.register[AppEnvironment], leadService.create[AppEnvironment])
+            .follow(
+              regService.register[AppEnvironment],
+              leadService.create[AppEnvironment],
+              leadViewService.getActive[AppEnvironment])
         }
         .compile
         .drain

@@ -23,6 +23,7 @@ import ru.otus.sales.leads.generator.services.cores.leads.models.LeadError.{
 import ru.otus.sales.leads.generator.services.cores.leads.models.{LeadError, LeadInfo}
 import ru.otus.sales.leads.generator.services.cores.users.endpoints.UserEndpoint
 import ru.otus.sales.leads.generator.services.cores.users.models.{UserReg, UserRegError}
+import sttp.model.StatusCode.Unauthorized
 import sttp.model.Uri
 import sttp.tapir.client.sttp.SttpClientInterpreter
 import zio.{Has, RIO, ULayer, ZIO, ZLayer}
@@ -58,6 +59,9 @@ object BotLeadService {
           .attempt
         _ <- res.fold(
           {
+            case er: ErrorInfo[LeadError] if er.statusCode == Unauthorized =>
+              Scenario.eval[RIO[R, *], Unit](Logging.warn(s"Пользователь не загеристрирован")) *>
+                Scenario.eval(chat.send("Пройдите регистрацию через команду /register"))
             case er: ErrorInfo[LeadError] =>
               Scenario.eval[RIO[R, *], Unit](
                 Logging.warn(s"Не удалось создать пользователя, т.к. $er")) *>
