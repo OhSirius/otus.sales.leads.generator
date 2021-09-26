@@ -171,7 +171,9 @@ lazy val botService = (project in file("services/cores/bot"))
     version := _version,
     scalacOptions ++= _scalacOptions,
     idePackagePrefix := _idePackagePrefix.map(_ + ".services.cores.bot"),
+    addCompilerPlugin(kindProjector),
     libraryDependencies ++= logback,
+    libraryDependencies ++= zio,
     libraryDependencies ++= clientTapir,
     libraryDependencies ++= Seq(
       bot
