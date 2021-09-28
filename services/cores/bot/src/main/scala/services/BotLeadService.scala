@@ -77,12 +77,12 @@ object BotLeadService {
                 Logging.error(s"$e ${e.getStackTrace.mkString("Array(", ", ", ")")}")) *>
                 Scenario.eval(chat.send("Нет соединения с сервером CRM. Попробуйте позже"))
           },
-          _ => Scenario.eval(chat.send(s"Лид успешно создан в CRM"))
+          id => Scenario.eval(chat.send(s"Лид №$id успешно создан в CRM"))
         )
         _ <- Scenario.eval[RIO[R, *], Unit](Logging.info(s"Завершение создания лида"))
       } yield ()
 
-    def createLead[R <: BotApiConfiguration](info: LeadInfo, authId: AuthId): RIO[R, Boolean] =
+    def createLead[R <: BotApiConfiguration](info: LeadInfo, authId: AuthId): RIO[R, Int] =
       for {
         config <- ZIO.service[BotApiConfig]
         client = SttpClientInterpreter.toQuickClient(

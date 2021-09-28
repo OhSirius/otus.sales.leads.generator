@@ -25,7 +25,7 @@ object LeadService {
   type LeadService = Has[Service]
 
   trait Service {
-    def create(info: LeadInfo, user: User): ZIO[DBTransactor with Logging, ::[LeadError], Unit]
+    def create(info: LeadInfo, user: User): ZIO[DBTransactor with Logging, ::[LeadError], Int]
   }
 
   class ServiceImpl(
@@ -38,7 +38,7 @@ object LeadService {
 
     override def create(
         info: LeadInfo,
-        user: User): ZIO[DBTransactor with Logging, ::[LeadError], Unit] =
+        user: User): ZIO[DBTransactor with Logging, ::[LeadError], Int] =
       (for {
         _ <- Logging.info(s"Начало создания лида $info")
         _ <- validator.validate(info)
@@ -55,7 +55,7 @@ object LeadService {
           .tapCause(Logging.error("Создание лида", _))
           .orElseFail(~LeadError.LostConnection)
         _ <- Logging.info(s"Завершение создания лида $lead")
-      } yield ()).tapCause(Logging.error("Создание лида", _))
+      } yield lead.id.map(_.id).getOrElse(-1)).tapCause(Logging.error("Создание лида", _))
   }
 
   val live: URLayer[LeadRepository with PersonRepository with LeadValidator, LeadService] =
@@ -68,7 +68,7 @@ object LeadService {
 
   def create(
       info: LeadInfo,
-      user: User): ZIO[LeadService with DBTransactor with Logging, ::[LeadError], Unit] =
+      user: User): ZIO[LeadService with DBTransactor with Logging, ::[LeadError], Int] =
     ZIO.accessM(_.get.create(info, user))
 
 }

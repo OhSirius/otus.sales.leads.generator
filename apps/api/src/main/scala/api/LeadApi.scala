@@ -34,17 +34,17 @@ class LeadApi[
     R <: LeadViewService with UserLoginService with LeadService with DBTransactor with Logging]
     extends AuthApi {
 
-  val createServerEndpoint: ZServerEndpoint[R, (AuthId, LeadInfo), ErrorInfo[LeadError], Boolean] =
+  val createServerEndpoint: ZServerEndpoint[R, (AuthId, LeadInfo), ErrorInfo[LeadError], Int] =
     LeadEndpoint.create
       .zServerLogicPart[R, AuthId, LeadInfo, User](authorize(_))
       .andThen { case (user, info) =>
         for {
           correlationId <- UIO(Some(UUID.randomUUID()))
-          _ <- log.locally(
+          id <- log.locally(
             _.annotate(botId, user.botId).annotate(LogAnnotation.CorrelationId, correlationId)) {
             LeadService.create(info, user).mapError(ErrorInfo("Ошибка", BadRequest, _))
           }
-        } yield true
+        } yield id
       }
 
   val createRoutes: HttpRoutes[ZIO[R with Clock, Throwable, *]] =

@@ -1,0 +1,8 @@
+# https://github.com/tcoopman/image-webpack-loader/issues/104
+# https://github.com/tcoopman/image-webpack-loader/issues/124
+# https://bitworks.software/2018-11-14-dont-ignore-dockerignore-it-is-expensive.html
+# игнорировать каталоги .git .cache .idea  target
+.git
+.cache
+.idea
+target

@@ -121,10 +121,10 @@ object BotViewLeadService {
               .map(lead =>
                 Scenario.eval(chat.send(ContactContent(
                   lead.phone,
-//                      lead.fullName,
-//                      Some(s"№${lead.id}, цена ${lead.price}"),
-                  s"№${lead.id}, цена ${lead.price},",
-                  Some(lead.fullName),
+                  lead.fullName,
+                  Some(s" лид №${lead.id}, цена ${lead.price}"),
+                  //s"№${lead.id}, цена ${lead.price},",
+                  //Some(lead.fullName),
                   //Some(lead.price.toString())
                   None
                 ))))

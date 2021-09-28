@@ -12,6 +12,10 @@ services:
     volumes:
     - otus-sales-leads-generator-app_logs:/var/logs
     entrypoint: /bin/sh /run_jar.sh
+    ports:
+      - "4081:4080"
+    expose:
+      - "4081"
     tty: true
     dns_opt:
       - ndots:1

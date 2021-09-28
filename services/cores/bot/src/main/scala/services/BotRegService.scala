@@ -69,7 +69,9 @@ object BotRegService {
                 Logging.error(s"$e ${e.getStackTrace.mkString("Array(", ", ", ")")}")) *>
                 Scenario.eval(chat.send("Нет соединения с сервером CRM. Попробуйте позже"))
           },
-          _ => Scenario.eval(chat.send(s"Вы успешно зарегистрированы в CRM"))
+          _ =>
+            Scenario.eval(chat.send(s"Вы успешно зарегистрированы в CRM")) *> Scenario.eval(
+              chat.send(s"Вам доступны следующие команды: /register, /createLead, /activeLead"))
         )
         _ <- Scenario.eval[RIO[R, *], Unit](Logging.info(s"Завершение регистрации пользователя"))
       } yield ()

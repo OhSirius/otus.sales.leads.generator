@@ -14,7 +14,7 @@ import sttp.tapir.generic.auto._
 
 object LeadEndpoint {
 
-  val create: ZEndpoint[(AuthId, LeadInfo), ErrorInfo[LeadError], Boolean] =
+  val create: ZEndpoint[(AuthId, LeadInfo), ErrorInfo[LeadError], Int] =
     authEndpoint[LeadError]
       .description("Создание лида")
       .post
@@ -23,6 +23,6 @@ object LeadEndpoint {
         jsonBody[LeadInfo]
           .description("Модель лида")
           .example(LeadInfo("Павлычев Александр", "89202921268", 156.1)))
-      .out(plainBody[Boolean])
+      .out(plainBody[Int])
 
 }

@@ -25,7 +25,7 @@ lazy val _scalacOptions = Seq(
 lazy val webApi = (project in file("apps/api"))
   .settings(
     name := "otus.sales.leads.generator.app.api",
-    mainClass := Some("ru.otus.sales.leads.generator.app.api.WebApp"),
+    mainClass := Some("ru.otus.sales.leads.generator.apps.api.WebApp"),
     version := _version,
     scalaVersion := _scalaVersion,
     idePackagePrefix := _idePackagePrefix.map(_ + ".apps.api"),
@@ -74,7 +74,7 @@ lazy val webApi = (project in file("apps/api"))
 lazy val telegramBot = (project in file("apps/bot"))
   .settings(
     name := "otus.sales.leads.generator.app.bot",
-    mainClass := Some("ru.otus.sales.leads.generator.app.bot.BotApp"),
+    mainClass := Some("ru.otus.sales.leads.generator.apps.bot.BotApp"),
     version := _version,
     scalaVersion := _scalaVersion,
     idePackagePrefix := _idePackagePrefix.map(_ + ".apps.bot"),
@@ -88,7 +88,7 @@ lazy val telegramBot = (project in file("apps/bot"))
       bot
     ),
     //assembly / test := {},
-    assemblyJarName := s"otus-sales-leads-generator-app-telegram-bot.jar",
+    assemblyJarName := s"otus-sales-leads-generator-app-bot.jar",
     assemblyMergeStrategy := {
       //case PathList("app.conf") => MergeStrategy.concat
       case PathList("logback.dev.xml") => MergeStrategy.discard

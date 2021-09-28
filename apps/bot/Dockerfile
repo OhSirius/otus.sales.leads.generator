@@ -35,7 +35,7 @@ WORKDIR /opt/src
 COPY . /opt/src
 
 # собираем проект
-RUN ["sbt", ";project webApi ;compile ;assembly"]
+RUN ["sbt", ";project telegramBot ;compile ;assembly"]
 
 #RUN apk add zip
 
@@ -43,10 +43,13 @@ RUN ["sbt", ";project webApi ;compile ;assembly"]
 #RUN zip -d apps/api/target/scala-${SCALA_VERSION_SHORT}/otus-sales-leads-generator-app-api.jar 'META-INF/*.SF' 'META-INF/*.RSA' 'META-INF/*SF'
 
 
-WORKDIR /opt/src/apps/api
+WORKDIR /opt/src/apps/bot
+
+#RUN ls
+#RUN ls target/scala-${SCALA_VERSION_SHORT}
 
 # копируем всё необходимое для работы в /opt/app/
-RUN cp ./run_jar.sh ./target/scala-${SCALA_VERSION_SHORT}/otus-sales-leads-generator-app-api.jar \
+RUN cp ./run_jar.sh ./target/scala-${SCALA_VERSION_SHORT}/otus-sales-leads-generator-app-bot.jar \
     ./src/main/resources/application.conf ./src/main/resources/application.dev.conf ./src/main/resources/application.test.conf ./src/main/resources/application.prod.conf \
     ./src/main/resources/logback.dev.xml ./src/main/resources/logback.test.xml ./src/main/resources/logback.prod.xml \
     /opt/app/
